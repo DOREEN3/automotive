@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Getautomotive from './components/Getautomotive';
+import Addautomotive from './components/Addautomotive';
+import Signin from './components/Signin';
+import Signup from './components/Signup';
+import Mpesapayment from './components/Mpesapayment';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      {/* Navigation */}
+     <Navbar/>
+
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={<Getautomotive />} />
+        <Route path="/addautomotive" element={<Addautomotive />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/signup" element={<Signup/>} />
+        <Route path="/mpesapayment" element={<Mpesapayment />} />
+
+
+      </Routes>
+      <Footer/>
+    </BrowserRouter>
   );
 }
 
-export default App;
+export default App
