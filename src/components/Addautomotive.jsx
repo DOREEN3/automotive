@@ -1,3 +1,4 @@
+import axios from 'axios'
 import React , {useState} from 'react'
 
 const Addautomotive = () => {
@@ -10,17 +11,47 @@ const Addautomotive = () => {
     warrant : "",
     photo :""
   })
+
+  // define state for posting data
+  const [loading,setLoading]=useState("")
+  const [error,setError]=useState("")
+  const [success,setSuccess]=useState("")
+
+
   const handleChange=(e)=>{
     const {name,value ,files}=e.target
-    if(name == "photo"){
+    if(name === "photo"){
       setFormData({...formData,[name] :files[0]})
     }else{
     setFormData ({...formData,[name] : value})
     }
   }
 
-  const handleSubmit=(e)=>{
+  const handleSubmit= async (e)=>{
     e.preventDefault()
+    setLoading("Please wait...")
+    
+    //define empty envelope
+    const envelopedata=new FormData()
+    //append data
+    envelopedata.append("name",formData.name)
+    envelopedata.append("brand",formData.brand)
+    envelopedata.append("compatibility",formData.compartibility)
+    envelopedata.append("price",formData.price)
+    envelopedata.append("stock_quantity",formData.quantity)
+    envelopedata.append("warrant_period",formData.warrant)
+    envelopedata.append("automotive_photo",formData.photo)
+
+    //post data
+    try {
+      const response=await axios.post("https://doreen98.pythonanywhere.com/api/add_automotive",envelopedata)
+      setSuccess(response.data.message)
+      setLoading("")
+    } catch (error) {
+      setError(error.message)
+      setLoading("")
+      
+    }
     
   }
 
@@ -30,7 +61,12 @@ const Addautomotive = () => {
       <form onSubmit={handleSubmit} className="shadow border rounded p-4 w-50">
         <fieldset>
           <legend className="text-center fw-bold fs-3">Add Automotive</legend>
-          
+          {/* binding variable */}
+
+          <h2 className="text-info">{loading}</h2>
+          <h2 className="text-success">{success}</h2>
+          <h2 className="text-danger">{error}</h2>
+
           <input type="text"
           placeholder='Enter Automotive Name' 
           value={formData.name}
