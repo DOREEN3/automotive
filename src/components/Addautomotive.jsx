@@ -107,7 +107,7 @@ const Addautomotive = () => {
           required
           className="rounded px-2 w-100 py-2"/> <br /> <br />
 
-          <input type="number"
+          <input type="text"
           name='warrant'
           required
           value={formData.warrant}
