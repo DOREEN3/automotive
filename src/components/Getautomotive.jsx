@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom'
 const Getautomotive = () => {
   let navigate=useNavigate() 
 
-  const[sortOrder,setSortOrder]=useState("")
+  const[sortDirection,setSortDirection]=useState("")
   const[searchTerm,setSearchTerm]=useState("")  
+  const [sortByField,setSortByField]=useState("")
+  const [selectedCategory,setSelectedCategory]=useState("All categories")
 
   const [loading, setLoading] = useState("")
   const [products, setProducts] = useState([])
@@ -28,45 +30,125 @@ const Getautomotive = () => {
     getproducts()
   }, [])
 
+  const categories=["Brand",...new Set(products.map(p=>p.brand))];
+
+
+  const filteredProducts = products
+  .filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (selectedCategory === "Brand" || product.brand === selectedCategory)
+  )
+  .sort((a, b) => {
+    if (!sortByField || !sortDirection) return 0;
+  
+    let aValue = a[sortByField];
+    let bValue = b[sortByField];
+  
+    // Convert price strings to numbers safely
+    if (sortByField === "price") {
+      aValue = parseFloat(aValue);
+      bValue = parseFloat(bValue);
+    }
+  
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortDirection === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    } else {
+      return sortDirection === "asc"
+        ? aValue - bValue
+        : bValue - aValue;
+    }
+  });
+  
+
+
+  
+  // reset all filter 
+  const handleReset=()=>{
+    setSearchTerm("")
+    setSortDirection("")
+    setSelectedCategory("Brand")
+    setSortByField("")
+  }
   const imagepath = 'https://doreen98.pythonanywhere.com/static/images/'
 
   return (
     <div className='container-fluid'>
+       <h4 className="text-info">{loading}</h4>
+      <h4 className="text-danger">{error}</h4>
+
       <h3 className="text-primary text-center my-4">Available Automotives</h3>
 
       <div className="row p-4">
         <div className="col-md-3">
           <input type="text" placeholder='Search by name' value={searchTerm}
-          onClick={(e)=>setSearchTerm(e.target.value)}className='w-100' style={{height:"35px",padding:"10px"}}/>
+          onChange={(e)=>setSearchTerm(e.target.value)}className='w-100' style={{height:"35px",padding:"10px"}}/>
         </div>
-        <div className="col-md-3">
-          <select name="sortOrder" id="sortOrder" value={sortOrder} onClick={(e)=>setSortOrder(e.target.value)} className='w-100' style={{height:"35px"}}>
-            <option value="All categories">All categories</option>
-            <option value="Name">Name</option>
-            <option value="Brand">Brand</option>
+       
+          <div className="col-md-2">
+              <select
+            className="form-select"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+             >
+            {categories.map((category, index) => (
+              <option key={index} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
         </div>
+
         <div className="col-md-2">
-          <select name="sortOrder" id="sortOrder" className='w-100' style={{height:"35px"}}>
-            <option value="Min">Min Price</option>
+        <select
+            className="form-select"
+            value={sortDirection}
+            onChange={(e) => {
+              setSortByField("price");
+              setSortDirection(e.target.value);
+            }}
+          >
+            <option value="">Price</option>
+            <option value="desc">Highest Price</option>
+            <option value="asc">Lowest Price</option>
           </select>
+
         </div>
         <div className="col-md-2">
-          <select name="sortOrder" id="sortOrder" className='w-100' style={{height:"35px"}}>
-            <option value="Max">Max Price</option>
+          <select
+            className="form-select"
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "az" || value === "za") {
+                setSortByField("name");
+                setSortDirection(value === "az" ? "asc" : "desc");
+              } else {
+                setSortByField("price");
+                setSortDirection(""); // Default to no sorting
+              }
+            }}
+          >
+            <option value="">Sort by Name</option>
+            <option value="az">A - Z</option>
+            <option value="za">Z - A</option>
           </select>
         </div>
+
+
         <div className="col-md-2">
-          <button className="btn btn-dark w-100 border rounded">Reset</button>
+          <button className="btn btn-dark w-100 border rounded" onClick={handleReset}>Reset</button>
         </div>
 
       </div>
-      {loading && <p className="text-center">{loading}</p>}
-      {error && <p className="text-danger text-center">{error}</p>}
+    
 
       <div className='row p-4'>
-        {products.map((product) => (
-          <div  className='col-md-4 d-flex align-items-stretch justify-content-center mb-4'>
+      {filteredProducts.length === 0 ? (
+          <div className="text-center text-muted">No products found.</div>
+        ) : (
+          filteredProducts.map((product, index) => (
+          <div key={product.id || index} className='col-md-4 d-flex align-items-stretch justify-content-center mb-4'>
             <div className="card h-100 shadow card-margin" style={{ maxWidth: '30rem' }}>
               <img src={imagepath + product.automotive_photo} alt={product.name} className='productimage mt-2' />
               <div className="card-body ">
@@ -97,7 +179,8 @@ const Getautomotive = () => {
               </div>
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
     </div>
   )

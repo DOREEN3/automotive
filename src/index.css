@@ -27,3 +27,11 @@ code {
   transform: rotate3d(0, 1, 0, 15deg) scale(1.03);
   box-shadow: 5px 10px 18px ;
 }
+
+html, body {
+  height: 100%;
+}
+
+.min-vh-100 {
+  min-height: 100vh;
+}

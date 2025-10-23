@@ -9,11 +9,13 @@ import Footer from './components/Footer';
 
 function App() {
   return (
+    <div className="d-flex flex-column min-vh-100">
     <BrowserRouter>
       {/* Navigation */}
      <Navbar/>
 
       {/* Routes */}
+      <main className="flex-fill">
       <Routes>
         <Route path="/" element={<Getautomotive />} />
         <Route path="/addautomotive" element={<Addautomotive />} />
@@ -23,8 +25,10 @@ function App() {
 
 
       </Routes>
+      </main>
       <Footer/>
     </BrowserRouter>
+    </div>
   );
 }
 
