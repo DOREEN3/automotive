@@ -1,27 +1,37 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
+import { Pagination } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
 const Getautomotive = () => {
   let navigate=useNavigate() 
-
+  
+// define state for sorting and filtering 
   const[sortDirection,setSortDirection]=useState("")
   const[searchTerm,setSearchTerm]=useState("")  
   const [sortByField,setSortByField]=useState("")
-  const [selectedCategory,setSelectedCategory]=useState("All categories")
+  const [selectedCategory,setSelectedCategory]=useState("Brand")
 
+// define state for posting data
   const [loading, setLoading] = useState("")
   const [products, setProducts] = useState([])
   const [error, setError] = useState("")
 
+  // define states for Pagination 
+  const [currentPage,setCurrentPage]=useState(1)
+  const [itemsPerPage,setItemsPerPage]=useState(8)
+
+  // function for getting products 
   const getproducts = async () => {
     setLoading("Please wait...")
     try {
       const response = await axios.get("https://doreen98.pythonanywhere.com/api/get_automotive")
       setProducts(response.data)
+      // reset loading 
       setLoading("")
     } catch (error) {
       setError(error.message)
+      // reset loading 
       setLoading("")
     }
   }
@@ -30,9 +40,10 @@ const Getautomotive = () => {
     getproducts()
   }, [])
 
+  // map the brands in automotive
   const categories=["Brand",...new Set(products.map(p=>p.brand))];
 
-
+//  define function to filter and sort products 
   const filteredProducts = products
   .filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -44,7 +55,7 @@ const Getautomotive = () => {
     let aValue = a[sortByField];
     let bValue = b[sortByField];
   
-    // Convert price strings to numbers safely
+    // Convert price strings to numbers 
     if (sortByField === "price") {
       aValue = parseFloat(aValue);
       bValue = parseFloat(bValue);
@@ -62,6 +73,17 @@ const Getautomotive = () => {
   });
   
 
+  // pagination calculation 
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstPage = indexOfLastItem - itemsPerPage
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const currentItems=filteredProducts.slice(indexOfFirstPage,indexOfLastItem)
+
+  // handle page change 
+  const handlePageChange=(pageNumber)=>{
+    setCurrentPage(pageNumber)
+  }
+
 
   
   // reset all filter 
@@ -71,6 +93,14 @@ const Getautomotive = () => {
     setSelectedCategory("Brand")
     setSortByField("")
   }
+
+  // reset pagination current page to 1 whenever search
+
+  const handleSearch=(e)=>{
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
+  }
+
   const imagepath = 'https://doreen98.pythonanywhere.com/static/images/'
 
   return (
@@ -80,17 +110,23 @@ const Getautomotive = () => {
 
       <h3 className="text-primary text-center my-4">Available Automotives</h3>
 
+      {/* sorting and filtering   */}
+
       <div className="row p-4">
         <div className="col-md-3">
           <input type="text" placeholder='Search by name' value={searchTerm}
-          onChange={(e)=>setSearchTerm(e.target.value)}className='w-100' style={{height:"35px",padding:"10px"}}/>
+          onChange={handleSearch}
+          className='w-100' style={{height:"35px",padding:"10px"}}/>
         </div>
        
           <div className="col-md-2">
               <select
             className="form-select"
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value)
+              setCurrentPage(1)
+              }}
              >
             {categories.map((category, index) => (
               <option key={index} value={category}>
@@ -107,6 +143,7 @@ const Getautomotive = () => {
             onChange={(e) => {
               setSortByField("price");
               setSortDirection(e.target.value);
+              setCurrentPage(1)
             }}
           >
             <option value="">Price</option>
@@ -123,6 +160,7 @@ const Getautomotive = () => {
               if (value === "az" || value === "za") {
                 setSortByField("name");
                 setSortDirection(value === "az" ? "asc" : "desc");
+                setCurrentPage(1)
               } else {
                 setSortByField("price");
                 setSortDirection(""); // Default to no sorting
@@ -143,11 +181,12 @@ const Getautomotive = () => {
       </div>
     
 
+        {/* filter and map the products  */}
       <div className='row p-4'>
-      {filteredProducts.length === 0 ? (
+      {currentItems.length === 0 ? (
           <div className="text-center text-muted">No products found.</div>
         ) : (
-          filteredProducts.map((product, index) => (
+          currentItems.map((product, index) => (
           <div key={product.id || index} className='col-md-4 d-flex align-items-stretch justify-content-center mb-4'>
             <div className="card h-100 shadow card-margin" style={{ maxWidth: '30rem' }}>
               <img src={imagepath + product.automotive_photo} alt={product.name} className='productimage mt-2' />
@@ -181,6 +220,25 @@ const Getautomotive = () => {
           </div>
         ))
       )}
+      </div>
+
+
+      {/* pagination  */}
+      <div className="d-flex justify-content-center mt-4">
+        <nav>
+          <ul className="pagination">
+            {Array.from({length : totalPages},(_ , index)=>(
+              <li key={index}
+              className={`page-item ${currentPage ===  index + 1 ? "active" : ""}` }>
+                <button className='page-link' onClick={()=>handlePageChange(index + 1)}>
+                    {index + 1}
+                </button>
+
+              </li>
+
+            ))}
+          </ul>
+        </nav>
       </div>
     </div>
   )
