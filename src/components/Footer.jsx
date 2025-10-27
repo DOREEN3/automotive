@@ -18,15 +18,15 @@ const Footer = () => {
             <br />
             <textarea placeholder="Leave a message" className="form-control"></textarea>
             <br />
-            <button className="btn btn-outline-danger">Send Message</button>
+            <button className="btn btn-outline-danger mb-2">Send Message</button>
           </div>
 
           <div className="col-md-4 ">
             <h2 className="text-white text-center">Stay Connected</h2>
-            <div className="d-flex justify-content-center">
-              <img src="assets/fb.png" alt="facebook" style={{ width: '15%'}} />
-              <img src="assets/in.png" alt="instagram" style={{ width: '15%'}} />
-              <img src="assets/x.png" alt="x" style={{ width: '15%' }} />
+            <div className="d-flex justify-content-center ">
+              <img src="assets/fb.png" alt="facebook" style={{ width: '10%',height:"50px",padding:"5px"}} />
+              <img src="assets/in.png" alt="instagram" style={{ width: '10%',height:"50px",padding:"5px"}} />
+              <img src="assets/x.png" alt="x" style={{ width: '10%',height:"50px" ,padding:"5px"}} />
             </div>
             <p className='mt-4'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem ut doloribus voluptate quod et ratione? Minus ducimus rem corporis delectus.</p>
           </div>
