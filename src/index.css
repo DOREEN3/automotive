@@ -35,3 +35,27 @@ html, body {
 .min-vh-100 {
   min-height: 100vh;
 }
+.signup-form {
+  width: 350px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signup-form input {
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+button[disabled] {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: -5px;
+}
